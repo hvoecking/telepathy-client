@@ -19,6 +19,7 @@
     </ion-row>
     <ion-row
       *ngFor="let button of [{
+        function: showKey.bind(this),
         clear: false,
         device: 'One',
         hint: 'device (eg. desktop)',
@@ -52,6 +53,7 @@
           large
           [disabled]="platform.is('core') && button.require == 'native'"
           [clear]="button.clear"
+          (click)="button.function()"
         >
           <ion-icon
             primary

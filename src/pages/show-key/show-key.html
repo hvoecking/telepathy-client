@@ -1,0 +1,34 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Scan key with the <b>other</b> device
+    </ion-title>
+    <ion-buttons start>
+      <button ion-button (click)="dismiss()">
+        <span ion-text color="primary" showWhen="ios">Cancel</span>
+        <ion-icon name="md-close" showWhen="android,windows,core"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col class="center" style="text-align: center;">
+        <p class="center">
+          Or enter this key manually:
+          <br>
+          {{ connection.getLocalName() }}
+        </p>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col class="center" style="text-align: center;">
+        <div class="center">
+          <qr-code [value]="connection.getLocalName()" [size]="300"></qr-code>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
