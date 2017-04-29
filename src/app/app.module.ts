@@ -6,9 +6,11 @@ import { IonicModule } from 'ionic-angular';
 import { NgModule } from '@angular/core';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
+import { HttpModule } from '@angular/http';
 
-import { MyApp } from './app.component';
+import { Connection } from '../providers/connection';
 import { HomePage } from '../pages/home/home';
+import { MyApp } from './app.component';
 
 @NgModule({
   declarations: [
@@ -17,6 +19,7 @@ import { HomePage } from '../pages/home/home';
   ],
   imports: [
     BrowserModule,
+    HttpModule,
     IonicModule.forRoot(MyApp),
   ],
   bootstrap: [
@@ -25,8 +28,10 @@ import { HomePage } from '../pages/home/home';
   entryComponents: [
     MyApp,
     HomePage,
+    KeyPage,
   ],
   providers: [
+    Connection,
     StatusBar,
     SplashScreen,
     {

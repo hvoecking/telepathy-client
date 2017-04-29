@@ -23,11 +23,15 @@
     "@ionic-native/splash-screen": "3.4.2",
     "@ionic-native/status-bar": "3.4.2",
     "@ionic/storage": "2.0.1",
+    "@types/simple-peer": "^6.1.1",
+    "@types/uuid": "^2.0.29",
     "font-awesome": "^4.7.0",
     "ionic-angular": "3.1.1",
     "ionicons": "3.0.0",
     "rxjs": "5.1.1",
+    "simple-peer": "^8.1.0",
     "sw-toolbox": "3.4.0",
+    "uuid": "^3.0.1",
     "zone.js": "^0.8.5"
   },
   "devDependencies": {
