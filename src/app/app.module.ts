@@ -10,12 +10,14 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { HttpModule } from '@angular/http';
 
 import { Connection } from '../providers/connection';
+import { EnterKeyPage } from '../pages/enter-key/enter-key';
 import { HomePage } from '../pages/home/home';
 import { ShowKeyPage } from '../pages/show-key/show-key';
 import { MyApp } from './app.component';
 
 @NgModule({
   declarations: [
+    EnterKeyPage,
     HomePage,
     MyApp,
     ShowKeyPage,
@@ -30,6 +32,7 @@ import { MyApp } from './app.component';
     IonicApp,
   ],
   entryComponents: [
+    EnterKeyPage,
     HomePage,
     MyApp,
     ShowKeyPage,

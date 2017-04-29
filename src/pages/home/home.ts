@@ -4,6 +4,7 @@ import { NavController } from 'ionic-angular';
 import { Platform } from 'ionic-angular';
 
 import { Connection } from '../../providers/connection';
+import { EnterKeyPage } from '../enter-key/enter-key';
 import { ShowKeyPage } from '../show-key/show-key';
 
 @Component({
@@ -23,6 +24,11 @@ export class HomePage {
 
   showKey() {
     let modal = this.modalCtrl.create(ShowKeyPage);
+    modal.present();
+  }
+
+  enterKey() {
+    let modal = this.modalCtrl.create(EnterKeyPage);
     modal.present();
   }
 }

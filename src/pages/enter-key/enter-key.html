@@ -1,0 +1,30 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Enter key from the <b>one</b> device
+    </ion-title>
+    <ion-buttons start>
+      <button ion-button (click)="dismiss()">
+        <span ion-text color="primary" showWhen="ios">Cancel</span>
+        <ion-icon name="md-close" showWhen="android,windows,core"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content padding>
+  <ion-input #id (keyup)="onId(id.value)" placeholder="{{ sampleId }}">
+  </ion-input>
+  <!--
+  <input #idGroup1 (keyup)="onIdGroup1(idGroup1.value)" maxlength="8">
+  -
+  <input #idGroup2 (keyup)="onIdGroup2(idGroup2.value)" maxlength="4">
+  -
+  <input #idGroup3 (keyup)="onIdGroup3(idGroup3.value)" maxlength="4">
+  -
+  <input #idGroup4 (keyup)="onIdGroup4(idGroup4.value)" maxlength="4">
+  -
+  <input #idGroup5 (keyup)="onIdGroup5(idGroup5.value)" maxlength="12">
+  <p>{{ formattedId }}</p>-->
+</ion-content>
