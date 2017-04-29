@@ -1,14 +1,67 @@
 <ion-header>
   <ion-navbar>
     <ion-title>
-      Ionic Blank
+      Telepathy
     </ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content padding>
-  The world is your oyster.
-  <p>
-    If you get lost, the <a href="http://ionicframework.com/docs/v2">docs</a> will be your guide.
-  </p>
+  <ion-grid padding>
+    <ion-col width-10>
+    </ion-col>
+    <ion-row>
+      <ion-col>
+        <p class="center">
+          Generate a key on <b>one</b> device and scan (or enter it manually) on the <b>other</b>.
+        </p>
+      </ion-col>
+    </ion-row>
+    <ion-row
+      *ngFor="let button of [{
+        clear: false,
+        device: 'One',
+        hint: 'device (eg. desktop)',
+        require: 'any',
+        text: 'Generate Key',
+        icon: 'fa fa-qrcode fa-lg'
+      }, {
+        clear: false,
+        device: 'Other',
+        hint: 'device (eg. mobile)',
+        require: 'native',
+        text: 'Scan Key',
+        icon: 'fa fa-camera fa-lg'
+      }, {
+        clear: true,
+        require: 'any',
+        text: 'More options...'
+      }]"
+      padding
+    >
+      <ion-col
+        class="center"
+        padding
+      >
+        <b>{{ button.device }}</b> {{ button.hint }}
+        <button
+          ion-button
+          icon-left
+          item-right
+          block
+          large
+          [disabled]="platform.is('core') && button.require == 'native'"
+          [clear]="button.clear"
+        >
+          <ion-icon
+            primary
+            class="{{ button.icon }}"
+            *ngIf="button.icon"
+          >
+          </ion-icon>
+          {{ button.text }}
+        </button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
