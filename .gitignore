@@ -69,3 +69,7 @@ $RECYCLE.BIN/
 .DS_Store
 Thumbs.db
 UserInterfaceState.xcuserstate
+
+# Symlinks for font awesome
+src/assets/fonts
+src/theme/font-awesome/
