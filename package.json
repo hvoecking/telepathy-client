@@ -1,8 +1,8 @@
 {
-  "name": "ionic-hello-world",
-  "version": "0.0.0",
-  "author": "Ionic Framework",
-  "homepage": "http://ionicframework.com/",
+  "name": "telepathy-client",
+  "version": "0.0.1",
+  "author": "Heye Vöcking",
+  "homepage": "telepathy.hvo.io",
   "private": true,
   "scripts": {
     "clean": "ionic-app-scripts clean",
@@ -49,5 +49,5 @@
       "locator": "ios"
     }
   ],
-  "description": "TelepathyClient: An Ionic project"
+  "description": "TelepathyClient: Transfer data 'telepathically' (using WebRTC) between devices"
 }
