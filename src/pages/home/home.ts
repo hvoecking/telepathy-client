@@ -3,9 +3,13 @@ import { ModalController } from 'ionic-angular';
 import { NavController } from 'ionic-angular';
 import { Platform } from 'ionic-angular';
 
+import { ConnectPage } from '../connect/connect';
 import { Connection } from '../../providers/connection';
 import { EnterKeyPage } from '../enter-key/enter-key';
+import { Link } from '../../providers/link';
 import { ShowKeyPage } from '../show-key/show-key';
+
+import * as _ from 'lodash';
 
 declare const cordova: any;
 
@@ -15,13 +19,29 @@ declare const cordova: any;
 })
 export class HomePage {
 
+  public status: string;
+  public linked: boolean = false;
+
   constructor(
+    private connection: Connection,
+    private link: Link,
+    private modalCtrl: ModalController,
     private navCtrl: NavController,
     private platform: Platform,
-    private modalCtrl: ModalController,
-    private connection: Connection,
   ) {
-    //
+    this.link.on('linked', () => {
+      this.linked = true;
+      this.navCtrl.push(ConnectPage);
+    });
+  }
+
+  ionViewDidEnter() {
+    console.log('ionViewDidEntered')
+    if (location.hash && location.hash !== '#') {
+      console.log('location.hash:', location.hash);
+      const id = _.last(location.hash.split('#'));
+      this.link.registerAsReceiver(Link.mkLinkId(id), id);
+    }
   }
 
   showKey() {
@@ -33,8 +53,9 @@ export class HomePage {
     this.platform.ready()
       .then(() => {
         cordova.plugins.barcodeScanner.scan((result) => {
-          this.connection.init(false);
-          this.connection.connectToInitiator(result.text);
+          const id = _.last(result.text.split('#'));
+          console.log('id:', id)
+          this.link.registerAsReceiver(Link.mkLinkId(id), id);
         }, (error) => {
           console.error(error);
         });

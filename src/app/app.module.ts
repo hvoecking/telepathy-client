@@ -9,18 +9,25 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { HttpModule } from '@angular/http';
 
+import { ActivePage } from '../pages/active/active';
 import { Connection } from '../providers/connection';
+import { ConnectPage } from '../pages/connect/connect';
 import { EnterKeyPage } from '../pages/enter-key/enter-key';
 import { HomePage } from '../pages/home/home';
+import { Link } from '../providers/link';
 import { ShowKeyPage } from '../pages/show-key/show-key';
+import { StatusPage } from '../pages/status/status';
 import { MyApp } from './app.component';
 
 @NgModule({
   declarations: [
+    ActivePage,
+    ConnectPage,
     EnterKeyPage,
     HomePage,
     MyApp,
     ShowKeyPage,
+    StatusPage,
   ],
   imports: [
     BrowserModule,
@@ -32,13 +39,17 @@ import { MyApp } from './app.component';
     IonicApp,
   ],
   entryComponents: [
+    ActivePage,
+    ConnectPage,
     EnterKeyPage,
     HomePage,
     MyApp,
     ShowKeyPage,
+    StatusPage,
   ],
   providers: [
     Connection,
+    Link,
     StatusBar,
     SplashScreen,
     {

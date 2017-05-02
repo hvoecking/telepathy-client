@@ -7,7 +7,7 @@
 </ion-header>
 
 <ion-content padding>
-  <ion-grid padding>
+  <ion-grid padding *ngIf="!connected">
     <ion-col width-10>
     </ion-col>
     <ion-row>
@@ -69,3 +69,7 @@
     </ion-row>
   </ion-grid>
 </ion-content>
+
+<ion-footer>
+  <page-status></page-status>
+</ion-footer>

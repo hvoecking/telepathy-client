@@ -13,37 +13,21 @@
 </ion-header>
 
 <ion-content>
-  <ion-grid *ngIf="!pass">
+  <ion-grid>
     <ion-row>
       <ion-col class="center" style="text-align: center;">
         <p class="center">
           Or enter this key manually:
           <br>
-          {{ linkId }}
+          {{ connection.getLocalName() }}
         </p>
       </ion-col>
     </ion-row>
     <ion-row>
       <ion-col class="center" style="text-align: center;">
         <div class="center">
-          <qr-code [value]="'http://localhost:8100/#' + connId" [size]="300"></qr-code>
+          <qr-code [value]="connection.getLocalName()" [size]="300"></qr-code>
         </div>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-
-  <ion-grid >
-    <ion-row>
-      <ion-col class="center" style="text-align: center;">
-        <p class="center">
-          Enter key displayed on other device:
-        </p>
-      </ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col>
-        <ion-input #passInput (keyup)="onPassInput(passInput.value)" placeholder="{{ pass?.replace('.', 'x') }}">
-        </ion-input>
       </ion-col>
     </ion-row>
   </ion-grid>

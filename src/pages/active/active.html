@@ -1,0 +1,29 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Telepathy</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <p>
+          Text:
+        </p>
+        <ion-textarea
+          [(ngModel)]='textInput'
+        >
+          {{ text }}
+        </ion-textarea>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
+
+<ion-footer>
+  <page-status></page-status>
+</ion-footer>

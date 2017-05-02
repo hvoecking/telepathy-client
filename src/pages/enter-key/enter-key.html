@@ -14,17 +14,19 @@
 
 
 <ion-content padding>
-  <ion-input #id (keyup)="onId(id.value)" placeholder="{{ sampleId }}">
-  </ion-input>
-  <!--
-  <input #idGroup1 (keyup)="onIdGroup1(idGroup1.value)" maxlength="8">
-  -
-  <input #idGroup2 (keyup)="onIdGroup2(idGroup2.value)" maxlength="4">
-  -
-  <input #idGroup3 (keyup)="onIdGroup3(idGroup3.value)" maxlength="4">
-  -
-  <input #idGroup4 (keyup)="onIdGroup4(idGroup4.value)" maxlength="4">
-  -
-  <input #idGroup5 (keyup)="onIdGroup5(idGroup5.value)" maxlength="12">
-  <p>{{ formattedId }}</p>-->
+  <ion-grid>
+    <ion-row *ngIf="!pass">
+      <ion-col>
+        <ion-input #id (keyup)="onId(id.value)" placeholder="{{ sampleId }}">
+        </ion-input>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="pass">
+      <ion-col>
+        <h1>
+          Enter {{ pass }} on other device
+        </h1>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

@@ -86,6 +86,7 @@
   <plugin name="phonegap-plugin-barcodescanner" spec="~6.0.6">
     <variable name="CAMERA_USAGE_DESCRIPTION" value=" "/>
   </plugin>
+  <plugin name="com.verso.cordova.clipboard" spec="https://github.com/VersoSolutions/CordovaClipboard.git"/>
   <engine name="android" spec="~6.1.2"/>
   <icon src="resources/android/icon/drawable-xhdpi-icon.png"/>
 </widget>

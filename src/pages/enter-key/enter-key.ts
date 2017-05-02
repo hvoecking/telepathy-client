@@ -3,7 +3,9 @@ import { NavController } from 'ionic-angular';
 import { NavParams } from 'ionic-angular';
 import { ViewController } from 'ionic-angular';
 
-import { Connection } from '../../providers/connection';
+import { Link } from '../../providers/link';
+
+import * as uuid from 'uuid';
 
 @Component({
   selector: 'page-enter-key',
@@ -11,23 +13,24 @@ import { Connection } from '../../providers/connection';
 })
 export class EnterKeyPage {
 
-  public formattedId: string;
-
-  public readonly sampleId = 'telepathy-name:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx';
+  public readonly sampleId = 'xxxxxx';
+  private pass: string;
 
   constructor(
+    private link: Link,
     private navCtrl: NavController,
     private navParams: NavParams,
     private viewCtrl: ViewController,
-    private connection: Connection,
   ) {
-    this.connection.init(false);
+    this.link.on('linked', () => {
+      this.dismiss();
+    });
   }
 
-  onId(id: string) {
-    this.formattedId = id;
-    if (this.formattedId.length == this.sampleId.length) {
-      this.connection.connectToInitiator(this.formattedId);
+  onId(shortId: string) {
+    if (shortId.length === this.sampleId.length) {
+      this.pass = uuid.v4().substr(0, 4);
+      this.link.registerAsReceiver(shortId, this.pass);
     }
   }
 
