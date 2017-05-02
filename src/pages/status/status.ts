@@ -5,6 +5,7 @@ import { NgZone } from '@angular/core';
 import { ViewController } from 'ionic-angular';
 
 import { Connection } from '../../providers/connection';
+import { Status } from '../../providers/status';
 
 @Component({
   selector: 'page-status',
@@ -13,17 +14,24 @@ import { Connection } from '../../providers/connection';
 export class StatusPage {
 
   public ping: number;
+  public status: string;
 
   constructor(
     private connection: Connection,
     private navCtrl: NavController,
     private navParams: NavParams,
     private zone: NgZone,
+    private statusProvider: Status,
     private viewCtrl: ViewController,
   ) {
     this.connection.on('ping', (ping) => {
       this.zone.run(() => {
         this.ping = ping;
+      });
+    });
+    this.statusProvider.on(message => {
+      this.zone.run(() => {
+        this.status = message;
       });
     });
   }

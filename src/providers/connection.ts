@@ -1,95 +1,26 @@
-import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
-import { Headers } from '@angular/http';
-import { RequestOptions } from '@angular/http';
-import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/map';
-import * as assert from 'assert';
-import * as uuid from 'uuid';
+import 'rxjs/add/operator/toPromise';
 import * as SimplePeer from 'simple-peer';
 import * as _ from 'lodash';
+import * as assert from 'assert';
+import { Headers } from '@angular/http';
+import { Http } from '@angular/http';
+import { Injectable } from '@angular/core';
+import { RequestOptions } from '@angular/http';
 
 import { Link } from './link';
+import { Observable } from '../common/observable';
+import { Status } from './status';
 
 declare var openpgp: any;
 
-const CONNECTION = 'http://localhost:3000/connection/';
+const URL = 'http://localhost:3000/connection/';
 
-const headers = new Headers({
-  'Content-Type': 'application/json',
-});
 const requestOptions = new RequestOptions({
-  headers: headers,
+  headers: new Headers({
+    'Content-Type': 'application/json',
+  }),
 });
-
-type Observer = (msg?: any) => void;
-
-class Observable {
-    observers: { [type: string]: Observer[] };
-
-    constructor() {
-        this.observers = {};
-    } // constructor
-
-    /**
-     * Add an observer to a type of message
-     *
-     * @param   {string}   type       Type of messages the observer subscribes to
-     * @param   {Observer} observer   Observer
-     * @returns {Observer}            Observer
-     */
-    addObserver(type: string, observer: Observer): Observer {
-        if (!(type in this.observers)) {
-            this.observers[type] = [];
-        }
-        this.observers[type].push(observer);
-        return observer;
-    } // addObserver
-
-    /**
-     * Remove an observer from a type of message
-     *
-     * @param   {string}   type       Type of messages the observer subscribes to
-     * @param   {Observer} observer   Observer
-     * @returns {void}
-     */
-    removeObserver(type: string, observer: Observer): void {
-        if (this.observers[type]) {
-            for (let i = 0; i < this.observers[type].length; i++) {
-                if (observer === this.observers[type][i]) {
-                    this.observers[type].splice(i, 1);
-                    return;
-                }
-            } // for i
-        }
-    } // removeObserver
-
-    /**
-     * Remove all observers from a type of message
-     *
-     * @param   {string}   type       Type of messages the observers subscribe to
-     * @returns {void}
-     */
-    removeObserversType(type: string): void {
-        delete this.observers[type];
-    } // removeObserversType
-
-    /**
-     * Send a message to observers
-     *
-     * @param   {string} type    Type of message to be sent to observers
-     * @param   {*}      [msg]   Content of the message
-     * @returns {void}
-     */
-    notifyObservers(type: string, msg?: any): void {
-        if (type in this.observers) {
-            for (let obs of this.observers[type]) {
-                obs(msg);
-            } // for obs
-        }
-    } // notifyObservers
-} // Observable
-
 
 class Peer {
 
@@ -126,29 +57,22 @@ class Peer {
 @Injectable()
 export class Connection {
 
+  private readonly observable = new Observable();
+  private connection: any;
+  private connId: string;
   private local: Peer;
   private remote: Peer;
-  private connection: any;
-  private observable: any;
-  public status: string;
-  private connId: string;
 
   constructor(
-    private http: Http,
-    private link: Link,
+    private readonly http: Http,
+    private readonly link: Link,
+    private readonly status: Status,
   ) {
-    this.observable = new Observable();
     this.link.on('connId', (connId) => this.connId = connId);
   }
 
-  setStatus(message: string) {
-    this.status = message;
-    console.log('STATUS:', message)
-    this.observable.notifyObservers('status', message);
-  }
-
   on(subject: string, fn) {
-    this.observable.addObserver(subject, fn);
+    this.observable.add(subject, fn);
   }
 
   connect() {
@@ -163,23 +87,16 @@ export class Connection {
     });
 
     this.connection.on('signal', (data) => {
-      console.log('SIGNAL', data);
-
-      this.setStatus('Signal sent -> waiting for reply...');
-      this.reportProgress();
-      this.http.post(CONNECTION + this.connId, {data}, requestOptions)
+      this.status.set('Signal sent -> waiting for reply...', true);
+      this.http.post(URL + this.connId, {data}, requestOptions)
         .toPromise()
         .then(() => {
-          this.setStatus('Reply received -> waiting for connect...');
-          this.reportProgress();
-          this.observable.notifyObservers('put');
+          this.status.set('Reply received -> waiting for connect...', true);
         });
     });
 
     this.connection.on('connect', () => {
-      console.log('CONNECT');
-      this.setStatus('Telepathic link established -> exchanging keys...');
-      this.reportProgress();
+      this.status.set('Telepathic link established -> exchanging keys...', true);
       this.local.pubKey.then(pubKey => {
         const data = JSON.stringify({
           pubKey: pubKey,
@@ -190,25 +107,6 @@ export class Connection {
 
     this.connection.on('data', (data) => {
       const obj = JSON.parse(data);
-      if (!this.remote) {
-        assert(obj.pubKey, 'Missing pubKey in ' + data);
-        this.setStatus('Key received -> starting ping...');
-        this.reportProgress();
-        if (this.local.isInitiator) {
-          this.remote = new Peer(
-            false,
-            obj.pubKey,
-          );
-        } else {
-          this.remote = new Peer(
-            false,
-            obj.pubKey,
-          );
-        }
-        this.observable.notifyObservers('connect');
-        this.sendPing();
-        return;
-      }
       if (obj.ping) {
         this.connection.send(JSON.stringify({
           pong: obj.ping,
@@ -216,19 +114,30 @@ export class Connection {
         return;
       }
       if (obj.pong) {
-        this.observable.notifyObservers('ping', Date.now() - obj.pong);
+        this.observable.notify('ping', Date.now() - obj.pong);
+        this.sendPing();
+        return;
+      }
+      if (!this.remote) {
+        assert(obj.pubKey, 'Missing pubKey in ' + data);
+        this.status.set('Key received -> starting ping...', true);
+        this.remote = new Peer(
+          !this.local.isInitiator,
+          obj.pubKey,
+        );
+        this.observable.notify('connect');
         this.sendPing();
         return;
       }
       if (obj.message) {
         this.readEncryptedMessage(obj.message);
+        return;
       }
-      console.log('data: ' + data);
     });
     this.connection.on('close', () => {
-      this.setStatus('Connection closed');
+      this.status.set('Connection closed', false);
       this.connection = undefined;
-      this.observable.notifyObservers('close');
+      this.observable.notify('close');
     });
   }
 
@@ -243,7 +152,7 @@ export class Connection {
       .then((plaintext) => {
         const obj = JSON.parse(plaintext.data);
         Object.keys(obj).forEach((key) =>
-          this.observable.notifyObservers(key, obj[key])
+          this.observable.notify(key, obj[key])
         );
       });
   }
@@ -267,46 +176,27 @@ export class Connection {
   }
 
   async connectToInitiator() {
-    this.setStatus('Initialized -> searching for initator...');
-    this.reportProgress();
-    const peerData = await this.http.get(CONNECTION + this.connId + '/initiator')
+    this.status.set('Initialized -> searching for initator...', true);
+    const peerData = await this.http.get(URL + this.connId + '/initiator')
       .map(res => res.json().data)
       .toPromise();
-    this.setStatus('Initiator found -> initiating connection...');
-    this.reportProgress();
+    this.status.set('Initiator found -> waiting for connect...', true);
     await this.connect();
-    this.setStatus('Connecting initiated -> waiting for connect...');
-    this.reportProgress();
-    this.setStatus('Connected -> sending signal...');
-    this.reportProgress();
-    console.log('peerData:', peerData);
+    this.status.set('Connected -> sending signal...', true);
     this.connection.signal(peerData);
-    this.setStatus('Signal sent...');
-    this.reportProgress();
+    this.status.set('Signal sent...', true);
   }
 
-  private progress: number = 0;
-  private reportProgress() {
-    const TOTAL_PROGRESS = 9;
-    this.observable.notifyObservers('progress', this.progress / TOTAL_PROGRESS);
-  }
   async connectToReceiver() {
-    this.setStatus('Initialized -> initiating connection...');
-    this.reportProgress();
+    this.status.set('Initialized -> initiating connection...', true);
     await this.connect();
-    this.setStatus('Connecting initiated -> searching for receiver...');
-    this.reportProgress();
-    const peerData = await this.http.get(CONNECTION + this.connId + '/receiver')
+    this.status.set('Connecting initiated -> searching for receiver...', true);
+    const peerData = await this.http.get(URL + this.connId + '/receiver')
       .map(res => res.json().data)
       .toPromise();
-    this.setStatus('Receiver found -> connecting...');
-    this.reportProgress();
-    this.setStatus('Connected -> sending signal...');
-    this.reportProgress();
-    console.log('peerData:', peerData);
+    this.status.set('Connected -> sending signal...', true);
     this.connection.signal(peerData);
-    this.setStatus('Signal sent...');
-    this.reportProgress();
+    this.status.set('Signal sent...', true);
   }
 
   async sendMessage(message) {

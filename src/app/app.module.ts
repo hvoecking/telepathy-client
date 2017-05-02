@@ -16,6 +16,7 @@ import { EnterKeyPage } from '../pages/enter-key/enter-key';
 import { HomePage } from '../pages/home/home';
 import { Link } from '../providers/link';
 import { ShowKeyPage } from '../pages/show-key/show-key';
+import { Status } from '../providers/status';
 import { StatusPage } from '../pages/status/status';
 import { MyApp } from './app.component';
 
@@ -50,6 +51,7 @@ import { MyApp } from './app.component';
   providers: [
     Connection,
     Link,
+    Status,
     StatusBar,
     SplashScreen,
     {

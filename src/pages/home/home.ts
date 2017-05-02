@@ -37,7 +37,7 @@ export class HomePage {
 
   ionViewDidEnter() {
     console.log('ionViewDidEntered')
-    if (location.hash && location.hash !== '#') {
+    if (location.hash && location.hash.match(/#[0-9a-f-]{36}/)) {
       console.log('location.hash:', location.hash);
       const id = _.last(location.hash.split('#'));
       this.link.registerAsReceiver(Link.mkLinkId(id), id);

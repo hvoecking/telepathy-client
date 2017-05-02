@@ -6,6 +6,7 @@ import { ViewController } from 'ionic-angular';
 
 import { ActivePage } from '../active/active';
 import { Connection } from '../../providers/connection';
+import { Status } from '../../providers/status';
 
 const TOTAL = 10;
 
@@ -21,25 +22,16 @@ export class ConnectPage {
     private connection: Connection,
     private navCtrl: NavController,
     private zone: NgZone,
+    private status: Status,
   ) {
-    this.progress = this.makeProgressString(0);
-    this.connection.on('progress', (progress) => this.zone.run(() => {
-      this.progress = this.makeProgressString(progress);
-      console.log('Progress:', this.progress)
-    }));
+    this.progress = Status.makeProgressString(0, TOTAL);
+    this.status.onProgress(progress => {
+      this.zone.run(() => {
+        this.progress = Status.makeProgressString(progress, TOTAL);
+        console.log('Progress:', this.progress)
+      });
+    });
     this.connection.on('connect', () => this.navCtrl.push(ActivePage));
     this.connection.doConnect();
-  }
-
-  private makeProgressString(progress) {
-    const progressDone = progress * TOTAL;
-    const progressTodo = (1 - progress) * TOTAL;
-    return [
-      '[',
-      new Array(progressDone).join('='),
-      '>',
-      new Array(progressTodo).join(' '),
-      ']',
-    ].join('');
   }
 }
