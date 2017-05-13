@@ -87,6 +87,7 @@
     <variable name="CAMERA_USAGE_DESCRIPTION" value=" "/>
   </plugin>
   <plugin name="com.verso.cordova.clipboard" spec="https://github.com/VersoSolutions/CordovaClipboard.git"/>
+  <plugin name="cordova-plugin-google-analytics" spec="~1.8.2"/>
   <engine name="android" spec="~6.1.2"/>
   <icon src="resources/android/icon/drawable-xhdpi-icon.png"/>
 </widget>

@@ -9,7 +9,7 @@ import { RequestOptions } from '@angular/http';
 import { Observable } from '../common/observable';
 import { Status } from './status';
 
-const URL = 'http://localhost:3000/link/';
+const URL = 'https://telepathy.hvo.io/link/';
 
 const requestOptions = new RequestOptions({
   headers: new Headers({

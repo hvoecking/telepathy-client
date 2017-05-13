@@ -14,7 +14,7 @@ import { Status } from './status';
 
 declare var openpgp: any;
 
-const URL = 'http://localhost:3000/connection/';
+const URL = 'https://telepathy.hvo.io/connection/';
 
 const requestOptions = new RequestOptions({
   headers: new Headers({
@@ -75,11 +75,29 @@ export class Connection {
     this.observable.add(subject, fn);
   }
 
+  async setStatus(message: string, progress?: boolean) {
+    this.status.set(message, progress, this.local.isInitiator, Link.mkLinkId(this.connId));
+  }
+
+  private signalSent: boolean = false;
   connect() {
     console.log('local.isInitiator:', this.local.isInitiator)
     this.connection = new SimplePeer({
       initiator: this.local.isInitiator,
       trickle: false,
+      config: {
+        iceServers: [{
+          urls: 'stun:telepathy.hvo.io:5349?transport=udp',
+        }, {
+          urls: 'turn:telepathy.hvo.io:5349?transport=udp',
+          username: 'telepathy',
+          credential: 'avaene3re3eng4saeneezeaveihahx',
+        }, {
+          urls: 'turn:telepathy.hvo.io:5349?transport=tcp',
+          username: 'telepathy',
+          credential: 'avaene3re3eng4saeneezeaveihahx',
+        }],
+      },
     });
 
     this.connection.on('error', (err) => {
@@ -87,16 +105,22 @@ export class Connection {
     });
 
     this.connection.on('signal', (data) => {
-      this.status.set('Signal sent -> waiting for reply...', true);
+      console.log('data:', data)
+      if (this.signalSent) {
+        return;
+      }
+      this.signalSent = true;
+      this.setStatus('Signal sent -> waiting for reply...', true);
+      this.signalSent = true;
       this.http.post(URL + this.connId, {data}, requestOptions)
         .toPromise()
         .then(() => {
-          this.status.set('Reply received -> waiting for connect...', true);
+          this.setStatus('Reply received -> waiting for connect...', true);
         });
     });
 
     this.connection.on('connect', () => {
-      this.status.set('Telepathic link established -> exchanging keys...', true);
+      this.setStatus('Telepathic link established -> exchanging keys...', true);
       this.local.pubKey.then(pubKey => {
         const data = JSON.stringify({
           pubKey: pubKey,
@@ -120,7 +144,7 @@ export class Connection {
       }
       if (!this.remote) {
         assert(obj.pubKey, 'Missing pubKey in ' + data);
-        this.status.set('Key received -> starting ping...', true);
+        this.setStatus('Key received -> starting ping...', true);
         this.remote = new Peer(
           !this.local.isInitiator,
           obj.pubKey,
@@ -135,7 +159,7 @@ export class Connection {
       }
     });
     this.connection.on('close', () => {
-      this.status.set('Connection closed', false);
+      this.setStatus('Connection closed', false);
       this.connection = undefined;
       this.observable.notify('close');
     });
@@ -176,27 +200,27 @@ export class Connection {
   }
 
   async connectToInitiator() {
-    this.status.set('Initialized -> searching for initator...', true);
+    this.setStatus('Initialized -> searching for initator...', true);
     const peerData = await this.http.get(URL + this.connId + '/initiator')
       .map(res => res.json().data)
       .toPromise();
-    this.status.set('Initiator found -> waiting for connect...', true);
+    this.setStatus('Initiator found -> waiting for connect...', true);
     await this.connect();
-    this.status.set('Connected -> sending signal...', true);
+    this.setStatus('Connected -> sending signal...', true);
     this.connection.signal(peerData);
-    this.status.set('Signal sent...', true);
+    this.setStatus('Signal sent...', true);
   }
 
   async connectToReceiver() {
-    this.status.set('Initialized -> initiating connection...', true);
+    this.setStatus('Initialized -> initiating connection...', true);
     await this.connect();
-    this.status.set('Connecting initiated -> searching for receiver...', true);
+    this.setStatus('Connecting initiated -> searching for receiver...', true);
     const peerData = await this.http.get(URL + this.connId + '/receiver')
       .map(res => res.json().data)
       .toPromise();
-    this.status.set('Connected -> sending signal...', true);
+    this.setStatus('Connected -> sending signal...', true);
     this.connection.signal(peerData);
-    this.status.set('Signal sent...', true);
+    this.setStatus('Signal sent...', true);
   }
 
   async sendMessage(message) {

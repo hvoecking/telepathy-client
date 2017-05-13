@@ -1,5 +1,7 @@
 import * as _ from 'lodash';
+import { GoogleAnalytics } from '@ionic-native/google-analytics';
 import { Injectable } from '@angular/core';
+import { Platform } from 'ionic-angular';
 
 import { Observable } from '../common/observable';
 
@@ -10,9 +12,42 @@ export class Status {
 
   private readonly observable = new Observable();
   private progress: number = 0;
+  private readonly history: string[] = [];
+  private readonly analytics: Promise<any>;
 
-  set(message: string, progress?: boolean) {;
+
+  constructor(
+    private readonly ga: GoogleAnalytics,
+    private readonly platform: Platform,
+  ) {
+  this.analytics = this.platform.ready()
+    .then(() => this.ga.startTrackerWithId('UA-98921925-1'))
+    .then(() => {
+      console.log('Google analytics is ready now');
+      return this.ga;
+    })
+    .catch(e => console.log('Error starting GoogleAnalytics', e));
+  }
+
+  set(
+    message: string,
+    progress?: boolean,
+    isInitiator?: boolean,
+    linkId?: string,
+  ) {
     console.log('STATUS:', message);
+    this.analytics.then((analytics) => {
+      let label: string;
+      if (!_.isUndefined(isInitiator)) {
+        label = isInitiator ? 'initiator' : 'receiver';
+      }
+      let value: number;
+      if (!_.isUndefined(linkId)) {
+        value = parseInt(linkId);
+      }
+      analytics.trackView('send', 'event', 'status', message, label, value);
+    });
+    this.history.push(message);
     this.observable.notify('status', message);
     if (_.isUndefined(progress)) {
       return;
@@ -35,14 +70,5 @@ export class Status {
 
   static makeProgressString(progress, total) {
     return (progress * 100).toFixed(2) + "%";
-    // const progressDone = progress * total;
-    // const progressTodo = (1 - progress) * total;
-    // return [
-    //   '[',
-    //   new Array(progressDone).join('='),
-    //   '>',
-    //   new Array(progressTodo).join(' '),
-    //   ']',
-    // ].join('');
   }
 }

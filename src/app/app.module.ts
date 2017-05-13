@@ -1,5 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
+import { CloudModule } from '@ionic/cloud-angular';
+import { CloudSettings } from '@ionic/cloud-angular';
 import { ErrorHandler } from '@angular/core';
+import { GoogleAnalytics } from '@ionic-native/google-analytics';
 import { IonicApp } from 'ionic-angular';
 import { IonicErrorHandler } from 'ionic-angular';
 import { IonicModule } from 'ionic-angular';
@@ -20,6 +23,13 @@ import { Status } from '../providers/status';
 import { StatusPage } from '../pages/status/status';
 import { MyApp } from './app.component';
 
+
+const cloudSettings: CloudSettings = {
+  core: {
+    app_id: 'e6caaaa2',
+  },
+};
+
 @NgModule({
   declarations: [
     ActivePage,
@@ -32,6 +42,7 @@ import { MyApp } from './app.component';
   ],
   imports: [
     BrowserModule,
+    CloudModule.forRoot(cloudSettings),
     HttpModule,
     IonicModule.forRoot(MyApp),
     QRCodeModule,
@@ -50,6 +61,7 @@ import { MyApp } from './app.component';
   ],
   providers: [
     Connection,
+    GoogleAnalytics,
     Link,
     Status,
     StatusBar,

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { GoogleAnalytics } from '@ionic-native/google-analytics';
 import { ModalController } from 'ionic-angular';
 import { NavController } from 'ionic-angular';
 import { Platform } from 'ionic-angular';
@@ -24,6 +25,7 @@ export class HomePage {
 
   constructor(
     private connection: Connection,
+    private readonly ga: GoogleAnalytics,
     private link: Link,
     private modalCtrl: ModalController,
     private navCtrl: NavController,
