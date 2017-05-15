@@ -70,6 +70,9 @@ $RECYCLE.BIN/
 Thumbs.db
 UserInterfaceState.xcuserstate
 
+# generated pngs
+resources/*/icon
+
 # Symlinks for font awesome
 src/assets/fonts
 src/theme/font-awesome/
