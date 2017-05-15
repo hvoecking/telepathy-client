@@ -7,6 +7,8 @@ import { Connection } from '../../providers/connection';
 import { EnterKeyPage } from '../enter-key/enter-key';
 import { ShowKeyPage } from '../show-key/show-key';
 
+declare const cordova: any;
+
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html',
@@ -25,6 +27,18 @@ export class HomePage {
   showKey() {
     let modal = this.modalCtrl.create(ShowKeyPage);
     modal.present();
+  }
+
+  scanKey() {
+    this.platform.ready()
+      .then(() => {
+        cordova.plugins.barcodeScanner.scan((result) => {
+          this.connection.init(false);
+          this.connection.connectToInitiator(result.text);
+        }, (error) => {
+          console.error(error);
+        });
+      });
   }
 
   enterKey() {

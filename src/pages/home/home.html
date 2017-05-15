@@ -27,6 +27,7 @@
         text: 'Generate Key',
         icon: 'fa fa-qrcode fa-lg'
       }, {
+        function: scanKey.bind(this),
         clear: false,
         device: 'Other',
         hint: 'device (eg. mobile)',

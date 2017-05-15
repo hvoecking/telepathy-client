@@ -3,8 +3,15 @@
 echo Install global npm packages
 npm install -g ionic cordova
 
-echo Install npm packages
+echo Install local npm packages
 npm install
+
+echo Setup ionic
+ionic platform add --save browser
+ionic platform add --save ios
+ionic platform add --save android
+
+ionic plugin add --save phonegap-plugin-barcodescanner
 
 echo Link font awesome
 mkdir src/theme/font-awesome/
